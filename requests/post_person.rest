@@ -5,3 +5,12 @@ Content-Type: application/json
   "name": "Rolland Bridge",
   "number": "+109876543211122"
 }
+
+
+# POST https://phonebook-backend-8b9k.onrender.com/api/persons
+# Content-Type: application/json
+
+# {
+#   "name": "Rolland Bridge",
+#   "number": "+109876543211122"
+# }

@@ -1,20 +1,22 @@
-// const http = require('http')
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const path = require('path')
+const Phone = require('./models/phones')
 
-const port = 3001
+const port = process.env.PORT
 
 const app = express()
 app.use(cors())
 app.use(express.json())
-app.use(morgan(':method :url :status :res[content-length] - :response-time  ms :body'))
 app.use(express.static(path.join(__dirname, 'dist')))
 
 morgan.token('body', (req, res) => {
   return JSON.stringify(req.body)
 })
+
+app.use(morgan(':method :url :status :res[content-length] - :response-time  ms :body'))
 
 // let notes = [
 //   {
@@ -51,68 +53,95 @@ morgan.token('body', (req, res) => {
 
 app.get('/', (req, res) => {
   const index = 'dist/index.html'
+  // res.json(notes)
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+  // res.sendFile(path.resolve('dist'))
 })
 
 app.get('/api/persons', (req, res) => {
-  res.json(notes)
+  Phone.find({}).then(data => res.json(data))
 })
 
 app.get('/info', (req, res) => {
-  let count = notes.length
-  const info = `Phonebook has info for ${count} people <br/><br/> ${new Date().toString()}
-  `
-
-  res.send(info)
+  Phone.find({}).then(data => {
+    let count = data.length
+    const info = `Phonebook has info for ${count} people <br/><br/> ${new Date().toString()}
+    `
+    res.send(info)
+  }) 
 })
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
   let id = req.params.id
-  let person = notes.find((note) => note.id == id)
-
-  if (person) {
-    res.json(person)
-  } else {
-    res.status(404).end()
-  }
+  console.log(id)
+  Phone.findById(id)
+    .then(data => {
+      if (data) {
+        res.json(data)
+      } else {
+        res.status(404).end()
+      }
+    }).catch(error => {
+      next(error)
+    })
 })
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   let id = req.params.id
-  
-  try {
-    let person = notes.find((note) => note.id == id)
-    notes = notes.filter(note => note.id != person.id)
+  Phone.findByIdAndDelete(id)
+    .then(data => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
+})
 
-    // console.log(notes)
-
-    if (person) res.status(200).end()
-  } catch {
-    res.status(404).end()
-  }
+app.put('/api/persons/:id', (req, res, next) => {
+  let id = req.params.id
+  Phone.findById(id)
+    .then(data => {
+      if (data) {
+        data.name = req.body.name
+        data.number = req.body.number
+        res.json(data)
+        data.save().then(res.status(201).end())
+      } else {
+        return res.status(404).send({error: 'data not found'})
+      }
+    }).catch(error => next(error))
 })
 
 app.post('/api/persons/', (req, res) => {
   let data = req.body
 
   if (data.name && data.number) {
-    if (notes.find(note => note.name === data.name)) {
-      return res.status(409).json({"error": "name must be unique"})
-    }
+    const person = new Phone(data)
 
-    data['id'] = String(Math.ceil(Math.random() * 100) + 1)
-
-    notes.push(data)
-    // console.log(notes)
-    console.log(data.id)
-    res.status(201)
-    res.send(data.id)
-    
+    person.save().then(dat => {
+      console.log(dat)
+      res.status(201)
+      res.send(dat.id)
+    })
   } else {
     console.log('invalid data sent')
     res.status(204).end()
   }
 })
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({error: 'unknown endpoint'})
+}
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({error: 'malformatted id' })
+  }
+  next(error)
+}
+
+app.use(unknownEndpoint)
+app.use(errorHandler)
 
 app.listen(port, () => {
   console.log(`App started on port ${port}`)
