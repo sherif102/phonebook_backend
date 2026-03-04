@@ -4,8 +4,9 @@
   "description": "Creates a server for the notebook project",
   "main": "index.js",
   "scripts": {
+    "update:backend": "cd ../fullstackopen/part3/phonebook_backend cp -rf * ../../../phonebook_backend/",
     "build:ui": "rm -rf dist && cd ../fullstackopen/part2/phonebook && npm run build && cp -r dist ../../../phonebook_backend/",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "deploy:full": "npm run update:backend && npm run build:ui && git add . && git commit -m uibuild && git push",
     "start": "node index.js",
     "dev": "node --watch index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

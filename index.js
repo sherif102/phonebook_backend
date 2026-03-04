@@ -16,33 +16,33 @@ morgan.token('body', (req, res) => {
   return JSON.stringify(req.body)
 })
 
-let notes = [
-  {
-    "name": "James Hutton",
-    "number": "+1 765 8997",
-    "id": "1c64"
-  },
-  {
-    "id": "104b",
-    "name": "Ada Lovelace",
-    "number": "74609-665"
-  },
-  {
-    "id": "6072",
-    "name": "Willey Kanga",
-    "number": "+1-4971163-678"
-  },
-  {
-    "name": "Mellow",
-    "number": "7890098765432",
-    "id": "3b15"
-  },
-  {
-    "id": "1fd3",
-    "name": "Kroos Toni",
-    "number": "+122211"
-  }
-]
+// let notes = [
+//   {
+//     "name": "James Hutton",
+//     "number": "+1 765 8997",
+//     "id": "1c64"
+//   },
+//   {
+//     "id": "104b",
+//     "name": "Ada Lovelace",
+//     "number": "74609-665"
+//   },
+//   {
+//     "id": "6072",
+//     "name": "Willey Kanga",
+//     "number": "+1-4971163-678"
+//   },
+//   {
+//     "name": "Mellow",
+//     "number": "7890098765432",
+//     "id": "3b15"
+//   },
+//   {
+//     "id": "1fd3",
+//     "name": "Kroos Toni",
+//     "number": "+122211"
+//   }
+// ]
 
 // const App = http.createServer((request, response) => {
 //   response.writeHead(200, {'Content-Type': 'application/json'})
