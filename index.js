@@ -110,7 +110,7 @@ app.put('/api/persons/:id', (req, res, next) => {
     }).catch(error => next(error))
 })
 
-app.post('/api/persons/', (req, res) => {
+app.post('/api/persons/', (req, res, next) => {
   let data = req.body
 
   if (data.name && data.number) {
@@ -120,7 +120,7 @@ app.post('/api/persons/', (req, res) => {
       console.log(dat)
       res.status(201)
       res.send(dat.id)
-    })
+    }).catch(error => next(error))
   } else {
     console.log('invalid data sent')
     res.status(204).end()
@@ -135,7 +135,9 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
   if (error.name === 'CastError') {
-    return response.status(400).send({error: 'malformatted id' })
+    return response.status(400).json({error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({error: error.message})
   }
   next(error)
 }
