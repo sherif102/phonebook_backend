@@ -22,9 +22,13 @@ const phoneSchema = new mongoose.Schema({
     minLength: 8,
     validate: {
       validator: function(num) {
-        if (num.indexOf('-') === 2 || num.indexOf('-') === 3) {
-          return true
-        } return false
+        const dashIndex = num.indexOf('-')
+        if (dashIndex !== 2 && dashIndex !== 3) {
+          return false
+        }
+        if (num.indexOf('-', dashIndex + 1) !== -1) {
+          return false
+        } return true
       },
       message: props => `The minimum length must be 8 and have '-' on the third or fourth index`
     } 
